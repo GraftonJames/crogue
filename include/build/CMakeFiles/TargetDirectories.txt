@@ -1,0 +1,3 @@
+/home/james/proj/crogue/include/build/CMakeFiles/crogue.dir
+/home/james/proj/crogue/include/build/CMakeFiles/edit_cache.dir
+/home/james/proj/crogue/include/build/CMakeFiles/rebuild_cache.dir
