@@ -2,37 +2,32 @@
 #define KEYMAPPER_H_
 
 #include <stdio.h>
-#include "gamestate.h"
 
-#define ACTION_TYPE_MASK_BITS 4
+#define ACTION_COUNT 4
+#define ACTION_TYPE_MASK_BITS 8
+#define MAX_KEYS_PER_ACTION 10
 
-enum action_types = {
-	ACTION_TYPE_UI,
-	ACTION_TYPE_GAME,
-	ACTION_TYPE_WORLD,
+enum action_types {
+	ACTION_TYPE_UNDEFINED = 0,
+	ACTION_TYPE_UI = 1,
+	ACTION_TYPE_GAME = 2,
+	ACTION_TYPE_WORLD = 3,
 };
 
-enum actions = {
-	UIA_MAINMENU_OPEN = ACTION_TYPE_UI << (sizeof(int) - ACTION_TYPE_MASK_BITS),
-	GA_SAVE_WORLD = ACTION_TYPE_GAME << (sizeof(int) - ACTION_TYPE_MASK_BITS),
-	WA_MOVE_N = ACTION_TYPE_WORLD << (sizeof(int) - ACTION_TYPE_MASK_BITS),
+enum actions {
+	ACTION_UNDEFINED = 0,
+	UIA_MAINMENU_OPEN = (ACTION_TYPE_UI << (sizeof(int)*8 - ACTION_TYPE_MASK_BITS)),
+	GA_SAVE_WORLD = (ACTION_TYPE_GAME << (sizeof(int)*8 - ACTION_TYPE_MASK_BITS)),
+	WA_MOVE_N = (ACTION_TYPE_WORLD << (sizeof(int)*8 - ACTION_TYPE_MASK_BITS)),
 };
 
-struct key_action {
-	int key;
-	action_link *action;
-}; 
-
-struct action_link {
+struct action_key {
 	int action;
-	action_link *link;
+	int keys[MAX_KEYS_PER_ACTION];
 };
 
-
-int get_action(int keycode);
-
-int get_keybindings();
-
+struct action_key get_keys_for_action();
+struct action_key *init_key_action_pairs();
 
 #endif 
 

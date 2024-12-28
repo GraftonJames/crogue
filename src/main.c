@@ -4,57 +4,72 @@
 #include <panel.h>
 #include <menu.h>
 
-//internal headers
+//Project internal headers
+#include "keymapper.h"
 #include "keymapper.h"
 
-
-
-static void finish(int sig);
-static void main_loop();
-static void main_loop_step();
-static void nc_init();
-static void sig_reg();
-
-struct settings {
-	keyaction[] keybindings;  
+struct gamestate {
 };
 
+static void finish(int sig);
+static void main_loop(struct action_key *km);
+static void main_loop_step(struct action_key *km);
+static void nc_init();
+static void sig_reg();
+struct gamestate *init_gamestate();
+
 int
-main(int argc, char *args[]) {
-	// keymap km = create_keymaps();
+main(int argc, char *args[])
+{
+	struct action_key *km = init_key_action_pairs();
 
 	sig_reg();
 	nc_init();
 
-	main_loop();
+	main_loop(km);
 
 	finish(0);         
 }
 
-void sig_reg() {
-	signal(SIGINT, finish);      /* arrange interrupts to terminate */
+void sig_reg()
+{
+	signal(SIGINT, finish); 
 }
-
-void nc_init() {
+void nc_init()
+{
+	setlocale(LC_ALL, "");
 	initscr();
 	keypad(stdscr, FALSE);
 	nonl(); cbreak(); noecho();
 }
 
-void main_loop() {
-	for (;;) main_loop_step();
+void main_loop(struct action_key *km)
+{
+
+	for (;;) main_loop_step(km);
 }
 
-void main_loop_step() {
-	long c = wgetch(stdscr);
-	/* process the command keystroke */
-	move(0,10);
-	while (c > 10) {
-		addch((c % 10) + 48);
-		c = c / 10;
-		move(0,-1);
+static void main_loop_step(struct action_key *km)
+{
+	int c = wgetch(stdscr);
+
+	clear();
+	int i = 0;
+	while (
+		i < ACTION_COUNT &&
+		km[i].keys[0] != c
+	) i++;
+	
+	if (km[i].keys[0] != c) return;
+
+	int a = km[i].action;
+	while (a > 9) {
+		addch((a % 10) + 48);
+		a = a / 10;
+		move(0, 1);
 	}
-	addch(c % 10 + 48);
+	addch(a + 48);
+
 	refresh();
 }
 

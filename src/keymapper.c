@@ -1,159 +1,171 @@
 #include "keymapper.h"
-#include "gamestate.h"
-#include "err_handler.h"
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <err.h>
 #include <errno.h>
 #include <sys/types.h>
 
-
-#define ACTION_COUNT 1
-#define ACTION_COUNT_BITS 1
 #define ACTION_TYPE_MASK INT_MAX << (sizeof(int) - ACTION_TYPE_MASK_BITS)
 #define CONFIG_DEFAULT_PATH "keymap.cfg"
 
-const keymap_defaults keyaction[ACTION_COUNT] = {
+const struct action_key default_keymap[ACTION_COUNT] = {
+	{ACTION_UNDEFINED, {0,0,0,0,0,0,0,0,0,0}},
+	{UIA_MAINMENU_OPEN, {',',0,0,0,0,0,0,0,0,0}},
+	{GA_SAVE_WORLD, {'.',0,0,0,0,0,0,0,0,0}},
+	{WA_MOVE_N, {'p',0,0,0,0,0,0,0,0,0}}
+};
 
-}
+struct action_key *fread_key_action_pairs(FILE *fd);
+int keymap_save(struct action_key* keymap);
+int keymap_add(struct action_key* keymap, int key, int action);
+int keymap_remove(struct action_key* keymap, int key, int action);
+char *get_config_path();
+struct action_key *gen_keymap();
 
-keyaction* load_keymap_pairs(FILE *fd);
-keyaction* init_keymap_pairs();
-int key_hash(int c);
-int keymap_insert(keyaction[] hashmap, keyaction ka);
 
-struct keyaction_pair {
-	int key;
-	int action;
-}
-
-int get_action(gamestate *gs, int keycode)
+struct action_key* 
+fread_key_action_pairs(FILE *fd)
 {
-	return keymap_fetch(*gs.keybinds, keycode);
-}
+	struct action_key *buf = malloc(ACTION_COUNT * sizeof(struct action_key));
+	memset(buf, 0, sizeof(struct action_key) * ACTION_COUNT);
 
-keyaction[] init_keybinds()
-{
-	keyaction[ACTION_COUNT] pairs = init_keymap_pairs();
-	keyaction[ACTION_COUNT] h = malloc(ACTION_COUNT * sizeof(keyaction));
-
-	for (int i = 0; i < ACTION_COUNT; i++) {
-		keymap_insert(h, pairs[i]);
-	}
-	
-	free(pairs);
-	return h;
-}
-
-keyaction_pair* 
-load_keymap_pairs(FILE *fd)
-{
-
-	keyaction[ACTION_COUNT] ret = malloc(ACTION_COUNT * sizeof(keyaction));
-	if (ret == NULL)
+	if (buf == NULL)
 		goto exit;
 
-	ret = fread(sizeof(keyaction), ACTION_COUNT, ptr);
-	if (ret != ACTION_COUNT)
+	int res = fread(buf, sizeof(struct action_key), ACTION_COUNT, fd);
+	if (res != ACTION_COUNT)
 		goto clean_ret;
 
-	int res = fclose(ptr);
+	res = fclose(fd);
 	if (res != 0)
 		goto clean_ret;
 
-	return return
+	return buf;
 
 	clean_ret:
-		free(ret);
+		free(buf);
 	exit:
 		err(EXIT_FAILURE, NULL);
 }
 
-keyaction_pair*
-init_keymap_pairs()
+struct action_key*
+init_key_action_pairs()
 {
+	printf("entered keymapper.o");
 	char *keymap_file = get_config_path();
-	char *ptr = fopen(keymap_file, "rb");
+	FILE *fd = fopen(keymap_file, "rb");
 
-	if (ptr == NULL) {
+	if (fd == NULL) {
 		if (errno == ENOENT) {
-			return gen_keymap();
+			return (struct action_key *) default_keymap;
 		}
 		else {
-			err(EXIT_FAILURE, "%s", file_name);
+			err(EXIT_FAILURE, "%s", keymap_file);
 		}
 	}
 
-	keyaction[] km = load_keymap(ptr);
+	struct action_key *km = fread_key_action_pairs(fd);
 
 	return km;
 }
 
-int 
-key_hash(int c)
+
+int
+keymap_save(struct action_key *keymap)
 {
-	long h = 0x243f6 * 2 ^ sizeof(int);
-	h = c * h;
-	h = h >> (sizeof(long) - ACTION_COUNT_BITS);
-	h = h % ACTION_COUNT;
-	return (int) h;
-}
+	char *keymap_file = get_config_path();
+	printf(keymap_file);
+	FILE *fd = fopen(keymap_file, "wb");
+	if (fd == NULL) {
+		free(keymap);
+		exit(EXIT_FAILURE);
+	}
 
-int 
-keymap_insert(keyaction[] hashmap, keyaction_pair pair)
-{
-	int kh = key_hash(pair->key);
-	action_link *ptr;
-	keyaction *ka; 
+	int res = fwrite(keymap, sizeof(struct action_key), ACTION_COUNT, fd);
+	if (res != ACTION_COUNT) {
+		fclose(fd);
+		exit(EXIT_FAILURE);
+	}
 
-	while (hashmap[kh] != NULL || hashmap[kh].key != pair.key)
-		kh = (kh + 1) % ACTION_COUNT;
-
-	if (hashmap[kh] == NULL)
-		hashmap[kh].key = pair.key;
-
-	ptr = hashmap[kh].action;
-	while (ptr != NULL)
-		ptr = ptr.link;
-
-	ptr.action = pair.action;
+	fclose(fd);
+	if (fd != 0) {
+		exit(EXIT_FAILURE);
+	}
 
 	return 1;
 }
 
-keyaction 
-keymap_fetch(keyaction[] hashmap, key k)
+int
+keymap_add(struct action_key *keymap, int key, int action)
 {
-	int kh = key_hash(k);
-	while (hashmap[kh]->key != k)
-		kh = (kh + 1) % ACTION_COUNT;
+	int i = 0;
+	while (
+		i < ACTION_COUNT &&
+		keymap[i].action != ACTION_UNDEFINED &&
+		keymap[i].action != action
+	) i++;
+	
+	if (keymap[i].action == ACTION_UNDEFINED) {
+		keymap[i].action = action;
+		keymap[i].keys[0] = key;
+		return 1;
+	}
 
-	return hashmap[kh];
+	int j = 0;
+	while (
+		j <= MAX_KEYS_PER_ACTION &&
+		keymap[i].keys[j] != 0 &&
+		keymap[i].keys[j] != key
+	) j++;
+
+	if (keymap[i].keys[j] == key) 
+		return 1;
+
+	if (j == MAX_KEYS_PER_ACTION)
+		return -1;
+	
+	keymap[i].keys[j] = key;
+	return 1;
 }
 
 int
-keymap_edit(keyaction* hashmap, keyaction ka)
+keymap_remove(struct action_key *keymap, int key, int action)
 {
-	
-}
+	int i = 0;
+	while (
+		i <= ACTION_COUNT &&
+		keymap[i].action != action
+	) i++;
 
-int
-keymap_save(keyaction* hashmap)
-{
+	if (i == ACTION_COUNT) 
+		return -1;
 	
-}
+	int j = 0;
+	while (
+		j <= MAX_KEYS_PER_ACTION &&
+		keymap[i].keys[j] != 0 &&
+		keymap[i].keys[j] != key
+	) j++;
 
-bool
-get_action_type(int target_type, int action)
-{
-	return action >> (sizeof(int) - ACTION_TYPE_MASK_BITS);
+	if (keymap[i].keys[j] == 0 || j == MAX_KEYS_PER_ACTION) 
+		return -1;
+
+	while (
+		j +1 < MAX_KEYS_PER_ACTION &&
+		keymap[i].keys[j+1] != 0 
+	) {
+		keymap[i].keys[j] = keymap[i].keys[j+1];
+		j++;
+	}
+	keymap[i].keys[j+1] = 0;
+
+	return 1;
 }
 
 char*
 get_config_path()
 {
-}
-
-keyaction*
-gen_keymap()
-{
-	return keymap_defaults;
+	return "keymaps.cfg";
 }
