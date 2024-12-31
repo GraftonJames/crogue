@@ -1,7 +1,7 @@
 #ifndef KEYMAPPER_H_
 #define KEYMAPPER_H_
 
-#include <stdio.h>
+#include "common.h"
 
 #define ACTION_COUNT 4
 #define ACTION_TYPE_MASK_BITS 8
@@ -23,7 +23,7 @@ enum actions {
 
 struct action_key {
 	int action;
-	int keys[MAX_KEYS_PER_ACTION];
+	wint_t keys[MAX_KEYS_PER_ACTION];
 };
 
 struct action_key get_keys_for_action();

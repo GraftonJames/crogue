@@ -1,19 +1,22 @@
-#include <stdlib.h>
-#include <curses.h>
-#include <signal.h>
-#include <panel.h>
-#include <menu.h>
+#include "common.h"
 
-//Project internal headers
 #include "keymapper.h"
-#include "keymapper.h"
+#include "mapper.h"
 
 struct gamestate {
 };
 
 static void finish(int sig);
-static void main_loop(struct action_key *km);
-static void main_loop_step(struct action_key *km);
+void main_loop(
+	struct tile_map *tm,
+	struct obj_def *od,
+	struct action_key *km
+); 
+void print_map(
+	struct tile_map *tm,
+	struct obj_def *od
+); 
+
 static void nc_init();
 static void sig_reg();
 struct gamestate *init_gamestate();
@@ -21,63 +24,63 @@ struct gamestate *init_gamestate();
 int
 main(int argc, char *args[])
 {
+	printf("start");
 	struct action_key *km = init_key_action_pairs();
+	struct obj_def *od = malloc(sizeof(struct obj_def)*3);
+	struct tile_map *tm = malloc(sizeof(struct tile_map));
 
+	printf("before");
+	seed_map(od, tm);
 	sig_reg();
 	nc_init();
 
-	main_loop(km);
+	main_loop(tm, od, km);
 
 	finish(0);         
 }
 
-void sig_reg()
+static void sig_reg()
 {
 	signal(SIGINT, finish); 
 }
-void nc_init()
+static void nc_init()
 {
-	setlocale(LC_ALL, "");
+	setlocale(LC_ALL, "en_US.UTF-8");
 	initscr();
 	keypad(stdscr, FALSE);
 	nonl(); cbreak(); noecho();
 }
 
-void main_loop(struct action_key *km)
-{
+void main_loop(
+	struct tile_map *tm,
+	struct obj_def *od,
+	struct action_key *km
+) {
+	wint_t wc;
 
-	for (;;) main_loop_step(km);
+	for (;;) {
+		wget_wch(stdscr, &wc);
+
+		print_map(tm, od);
+
+		refresh();
+	}
 }
 
-static void main_loop_step(struct action_key *km)
-{
-	int c = wgetch(stdscr);
-
-	clear();
-	int i = 0;
-	while (
-		i < ACTION_COUNT &&
-		km[i].keys[0] != c
-	) i++;
-	
-	if (km[i].keys[0] != c) return;
-
-	int a = km[i].action;
-	while (a > 9) {
-		addch((a % 10) + 48);
-		a = a / 10;
-		move(0, 1);
+void print_map(
+	struct tile_map *tm,
+	struct obj_def *od
+) {
+	for (int x = 0; x < tm->height * tm->width; x++) {
+		wadd_wch(stdscr, tm->tiles[x].obj->def->paint);
+		if (x % tm->width == 0)
+			wmove(stdscr, x / tm->width, 0);
 	}
-	addch(a + 48);
-
-	refresh();
 }
 
 static void finish(int sig)
 {
 	endwin();
-
-	/* do your non-curses wrapup here */
 
 	exit(0);
 }

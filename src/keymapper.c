@@ -12,9 +12,9 @@
 
 const struct action_key default_keymap[ACTION_COUNT] = {
 	{ACTION_UNDEFINED, {0,0,0,0,0,0,0,0,0,0}},
-	{UIA_MAINMENU_OPEN, {',',0,0,0,0,0,0,0,0,0}},
-	{GA_SAVE_WORLD, {'.',0,0,0,0,0,0,0,0,0}},
-	{WA_MOVE_N, {'p',0,0,0,0,0,0,0,0,0}}
+	{UIA_MAINMENU_OPEN, {L',',0,0,0,0,0,0,0,0,0}},
+	{GA_SAVE_WORLD, {L'.',0,0,0,0,0,0,0,0,0}},
+	{WA_MOVE_N, {L'p',0,0,0,0,0,0,0,0,0}}
 };
 
 struct action_key *fread_key_action_pairs(FILE *fd);
