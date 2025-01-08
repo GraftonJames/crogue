@@ -4,7 +4,7 @@
 #include "common.h"
 
 #define ACTION_COUNT 7
-#define ACTION_TYPE_MASK_BITS 8
+#define STATE_MASK_BITS 8
 #define MAX_KEYS_PER_ACTION 10
 #define KEYBIND_HASH_MAP_BITWIDTH 8
 #define KEYBIND_HASH_MAP_SIZE 256
@@ -19,9 +19,9 @@ enum action_types {
 
 enum actions {
 	ACTION_UNDEFINED = 0,
-	UIA_MAINMENU_OPEN = (ACTION_TYPE_UI << (sizeof(int)*8 - ACTION_TYPE_MASK_BITS)),
-	GA_SAVE_WORLD = (ACTION_TYPE_GAME << (sizeof(int)*8 - ACTION_TYPE_MASK_BITS)),
-	WA_PROTAG_MOVE_N = (ACTION_TYPE_WORLD << (sizeof(int)*8 - ACTION_TYPE_MASK_BITS)),
+	UIA_MAINMENU_OPEN = (ACTION_TYPE_UI << (sizeof(int)*8 - STATE_MASK_BITS )),
+	GA_SAVE_WORLD = (ACTION_TYPE_GAME << (sizeof(int)*8 - STATE_MASK_BITS)),
+	WA_PROTAG_MOVE_N = (ACTION_TYPE_WORLD << (sizeof(int)*8 - STATE_MASK_BITS)),
 	WA_PROTAG_MOVE_S,
 	WA_PROTAG_MOVE_E,
 	WA_PROTAG_MOVE_W,
@@ -42,8 +42,7 @@ struct action_code_tab {
 	struct action_code_list *list;
 };
 
-struct action_key get_keys_for_action();
-struct action_key *init_key_action_pairs();
+int init_key_action_pairs(struct action_key* km);
 
 #endif 
 

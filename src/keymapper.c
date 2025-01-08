@@ -19,7 +19,7 @@ const struct action_key default_keymap[ACTION_COUNT] = {
 	{WA_PROTAG_MOVE_W, {'u',0,0,0,0,0,0,0,0,0}}
 };
 
-struct action_key *fread_key_action_pairs(FILE *fd);
+int fread_key_action_pairs(struct action_key* km, FILE *fd);
 int keymap_save(struct action_key* keymap);
 int keymap_add(struct action_key* keymap, int key, int action);
 int keymap_remove(struct action_key* keymap, int key, int action);
@@ -27,50 +27,46 @@ char *get_config_path();
 struct action_key *gen_keymap();
 
 
-struct action_key* 
-fread_key_action_pairs(FILE *fd)
+int
+fread_key_action_pairs(struct action_key* km, FILE *fd)
 {
-	struct action_key *buf = malloc(ACTION_COUNT * sizeof(struct action_key));
-	memset(buf, 0, sizeof(struct action_key) * ACTION_COUNT);
+	memset(km, 0, sizeof(struct action_key) * ACTION_COUNT);
 
-	if (buf == NULL)
-		goto exit;
+	if (km == NULL)
+		return 0;
 
-	int res = fread(buf, sizeof(struct action_key), ACTION_COUNT, fd);
+	int res = fread(km, sizeof(struct action_key), ACTION_COUNT, fd);
 	if (res != ACTION_COUNT)
-		goto clean_ret;
+		return 0;
 
 	res = fclose(fd);
 	if (res != 0)
-		goto clean_ret;
+		return 0;
 
-	return buf;
+	return 1;
 
-	clean_ret:
-		free(buf);
 	exit:
 		err(EXIT_FAILURE, NULL);
 }
 
-struct action_key*
-init_key_action_pairs()
+int
+init_key_action_pairs(struct action_key *km)
 {
-	printf("entered keymapper.o");
 	char *keymap_file = get_config_path();
 	FILE *fd = fopen(keymap_file, "rb");
 
 	if (fd == NULL) {
 		if (errno == ENOENT) {
-			return (struct action_key *) default_keymap;
+			km = (struct action_key *) default_keymap;
+			return 1;
 		}
 		else {
 			err(EXIT_FAILURE, "%s", keymap_file);
+			return 0;
 		}
 	}
 
-	struct action_key *km = fread_key_action_pairs(fd);
-
-	return km;
+	return fread_key_action_pairs(km, fd);
 }
 
 

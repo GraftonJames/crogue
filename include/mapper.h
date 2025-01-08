@@ -2,7 +2,6 @@
 #define MAPPER_H_
 
 #include "common.h"
-
 #include "object.h"
 
 #define TILE_MAP_MAX_HEIGHT 50
