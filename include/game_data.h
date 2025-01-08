@@ -1,9 +1,10 @@
-#ifndef OBJECT_H_
-#define OBJECT_H_
+#ifndef GAME_DATA_H_
+#define GAME_DATA_H_
 
 #include "common.h"
 
-#define MAX_OBJ_DEF 10
+#define TILE_MAP_MAX_HEIGHT 50
+#define TILE_MAP_MAX_WIDTH 50
 
 enum obj_prec {
 	OBJ_PREC_UNDEF = 0,
@@ -34,7 +35,22 @@ struct obj {
 	struct obj_def *def;
 };
 
+struct item_list {
+	struct obj *obj;
+	struct item_list *next;
+};
 
-int init_obj_defs(struct obj_def *defs);
+struct grid {
+	short height;
+	short width;
+	struct item_list **items;
+};
+
+struct game_data {
+	struct obj_def od;
+	struct grid grid;
+};
+
+int seed_map(struct obj_def *def, struct grid *tm); 
 
 #endif

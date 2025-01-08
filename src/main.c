@@ -5,7 +5,7 @@
 #include "mapper.h"
 
 static void finish(int sig);
-void main_loop(struct state *s, struct grid *g, struct obj_def *od); 
+void main_loop(struct state *s, struct game_data *gd); 
 
 static void nc_init();
 static void sig_reg();
@@ -15,8 +15,9 @@ main(int argc, char *args[])
 {
 	struct action_key km[ACTION_COUNT]; 
 	struct state_machine sm;
-	struct grid g;
-	struct obj_def od;
+	struct game_data gd;
+	struct grid *g = gd.grid;
+	struct obj_def *od;
 
 	init_key_action_pairs((struct action_key *) &km);
 
@@ -25,7 +26,7 @@ main(int argc, char *args[])
 	sig_reg();
 	nc_init();
 
-	main_loop((sm.current), &g, &od);
+	main_loop((sm.current), &gd);
 
 	finish(0);         
 }
@@ -45,8 +46,7 @@ static void nc_init()
 
 void main_loop(
 	struct state *s,
-	struct grid *g,
-	struct obj_def *od
+	struct game_data *gd
 ) {
 	wint_t k;
 	struct action_list *al;
@@ -54,8 +54,7 @@ void main_loop(
 	for (;;) {
 		wget_wch(stdscr, &k);
 
-		s->key_handle(k);
-		s->print_fn();
+		s->print_fn(gd);
 
 		wrefresh(stdscr);
 	}
