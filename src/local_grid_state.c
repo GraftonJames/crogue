@@ -22,7 +22,7 @@ void LOCAL_GRID_attach_actions(struct action_vtab *t, struct action_key *state_k
 	
 }
 
-void (*LOCAL_GRID_get_action(int code))(struct state *s, struct game_data *gd) {
+void (*LOCAL_GRID_get_action(enum actions code))(struct state *s, struct game_data *gd) {
 	switch (code) {
 		case WA_PROTAG_MOVE_N:
 			return protag_move_north;

@@ -6,6 +6,6 @@
 #include "statemachine.h"
 
 void LOCAL_GRID_print(struct state *, struct game_data *);
-void LOCAL_GRID_state_init(struct state *, struct action_key *);
+void (*LOCAL_GRID_get_action(enum actions))(struct state *s, struct game_data *gd);
 
 #endif

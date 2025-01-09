@@ -2,7 +2,6 @@
 
 #include "keymapper.h"
 #include "statemachine.h"
-#include "mapper.h"
 
 static void finish(int sig);
 void main_loop(struct state *s, struct game_data *gd); 
@@ -16,17 +15,16 @@ main(int argc, char *args[])
 	struct action_key km[ACTION_COUNT]; 
 	struct state_machine sm;
 	struct game_data gd;
-	struct grid *g = gd.grid;
-	struct obj_def *od;
 
 	init_key_action_pairs((struct action_key *) &km);
+	init_statemachine(&sm,(struct action_key *) &km);
 
-	seed_map(&od, &g);
+	seed_map(&gd);
 
 	sig_reg();
 	nc_init();
 
-	main_loop((sm.current), &gd);
+	main_loop((sm.cur), &gd);
 
 	finish(0);         
 }
@@ -54,7 +52,7 @@ void main_loop(
 	for (;;) {
 		wget_wch(stdscr, &k);
 
-		s->print_fn(gd);
+		s->print_fn(s, gd);
 
 		wrefresh(stdscr);
 	}

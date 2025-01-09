@@ -1,3 +1,4 @@
+clear
 rm -rf build
 rm compile_commands.json
 mkdir build

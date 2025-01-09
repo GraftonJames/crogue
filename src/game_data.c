@@ -6,31 +6,34 @@ struct obj_def seed_wall_def();
 struct obj_def seed_floor_def();
 int seed_object_def_table(struct obj_def *od); 
 
-int seed_map(struct obj_def *def, struct grid *tm) {
+int seed_map(struct game_data *gd) {
 
-	seed_object_def_table(def);
+	seed_object_def_table(gd->defs);
 
-	tm->height = 25;
-	tm->width = 50;
+	struct grid *grid = &gd->grid;
+	struct obj_def *def = gd->defs;
 
-	tm->items = malloc(sizeof(struct item_list *) * tm->height * tm->width);
-	for (int x = 0; x < tm->height * tm->width; x++) {
-		tm->items[x] = malloc(sizeof(struct item_list));
-		tm->items[x]->obj = malloc(sizeof(struct obj));
+	grid->height = 25;
+	grid->width = 50;
+
+	grid->items = malloc(sizeof(struct item_list *) * grid->height * grid->width);
+	for (int x = 0; x < grid->height * grid->width; x++) {
+		grid->items[x] = malloc(sizeof(struct item_list));
+		grid->items[x]->obj = malloc(sizeof(struct obj));
 		if (
-			x % tm->width == 0 ||
-			x % tm->width == 1 ||
-			x < tm->width ||
-			x > tm->width * (tm->height - 1)
-		) tm->items[x]->obj->def = def + 1;
-		else tm->items[x]->obj->def = def + 2;
+			x % grid->width == 0 ||
+			x % grid->width == 1 ||
+			x < grid->width ||
+			x > grid->width * (grid->height - 1)
+		) grid->items[x]->obj->def = def + 1;
+		else grid->items[x]->obj->def = def + 2;
 	}
 
 	struct item_list* t = malloc(sizeof(struct item_list));
 	t->obj = malloc(sizeof(struct obj));
 	t->obj->def = def;
-	t->next = tm->items[25*25 -1];
-	tm->items[25*25-1] = t;
+	t->next = grid->items[25*25 -1];
+	grid->items[25*25-1] = t;
 
 	return 0;
 }

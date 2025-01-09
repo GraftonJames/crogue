@@ -47,10 +47,10 @@ struct grid {
 };
 
 struct game_data {
-	struct obj_def od;
+	struct obj_def *defs;
 	struct grid grid;
 };
 
-int seed_map(struct obj_def *def, struct grid *tm); 
+int seed_map(struct game_data *gd); 
 
 #endif

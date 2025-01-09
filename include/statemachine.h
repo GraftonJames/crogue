@@ -18,7 +18,7 @@ struct action_list {
 struct action_vtab {
 	wint_t min_key;
 	wint_t max_key;
-	struct action_list *vtab;
+	struct action_list **vtab;
 	struct action_list *no_action;
 };
 

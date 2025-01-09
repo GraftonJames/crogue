@@ -11,8 +11,6 @@
 
 const struct action_key default_keymap[ACTION_COUNT] = {
 	{ACTION_UNDEFINED, {0,0,0,0,0,0,0,0,0,0}},
-	{UIA_MAINMENU_OPEN, {',',0,0,0,0,0,0,0,0,0}},
-	{GA_SAVE_WORLD, {'.',0,0,0,0,0,0,0,0,0}},
 	{WA_PROTAG_MOVE_N, {'e',0,0,0,0,0,0,0,0,0}},
 	{WA_PROTAG_MOVE_S, {'j',0,0,0,0,0,0,0,0,0}},
 	{WA_PROTAG_MOVE_E, {'o',0,0,0,0,0,0,0,0,0}},
