@@ -7,6 +7,8 @@
 #ifndef _CROGUE_COMMON_INCLUDES 
 #define _CROGUE_COMMON_INCLUDES
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <limits.h>
 #include <locale.h>
 

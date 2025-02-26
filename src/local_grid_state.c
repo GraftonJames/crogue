@@ -38,31 +38,15 @@ void (*LOCAL_GRID_get_action(enum actions code))(struct state *s, struct game_da
 };
 
 void protag_move_north(struct state *s, struct game_data *gd) {
-	struct grid *g = &gd->grid;
-	for (int i = 0; i < g->width * g->height; i++) {
-		if (g->items[i]->obj->def->id == OBJ_ID_PROTAG) {
-			struct item_list *protag = g->items[i];
-			protag->next = g->items[i - g->width];
-			g->items[i - g->width] = protag;
-			g->items[i] = g->items[i]->next;
-			break;
-		}
-	}
+	printf("moved north\n");
 }
 void protag_move_south(struct state *s, struct game_data *gd) {
-	struct grid *g = &gd->grid;
-	for (int i = 0; i < g->width * g->height; i++) {
-		if (g->items[i]->obj->def->id == OBJ_ID_PROTAG) {
-			struct item_list *protag = g->items[i];
-			protag->next = g->items[i + g->width];
-			g->items[i + g->width] = protag;
-			g->items[i] = g->items[i]->next;
-			break;
-		}
-	}
+	printf("moved south\n");
 }
 void protag_move_east(struct state *s, struct game_data *gd) {
+	printf("moved east\n");
 }
 void protag_move_west(struct state *s, struct game_data *gd) {
+	printf("moved west\n");
 }
 

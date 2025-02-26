@@ -8,6 +8,7 @@ int seed_object_def_table(struct obj_def *od);
 
 int seed_map(struct game_data *gd) {
 
+	gd->defs = malloc(sizeof(struct obj_def) * 3);
 	seed_object_def_table(gd->defs);
 
 	struct grid *grid = &gd->grid;

@@ -33,13 +33,15 @@ struct state {
 struct state_machine {
 	enum state_names cur_name;
 	struct state *cur;
-	struct state states[STATE_TYPE_COUNT];
+	struct state *states;
 	struct action_list no_action;
 };
 
-
-
 int init_statemachine(struct state_machine *s, struct action_key *km);
+
+void printf_state_machine_debug(struct state_machine *sm);
+
+struct action_list *get_state_action(struct state *s, wint_t key);
 
 #endif 
 

@@ -9,14 +9,6 @@
 
 #define CONFIG_DEFAULT_PATH "keymap.cfg"
 
-const struct action_key default_keymap[ACTION_COUNT] = {
-	{ACTION_UNDEFINED, {0,0,0,0,0,0,0,0,0,0}},
-	{WA_PROTAG_MOVE_N, {'e',0,0,0,0,0,0,0,0,0}},
-	{WA_PROTAG_MOVE_S, {'j',0,0,0,0,0,0,0,0,0}},
-	{WA_PROTAG_MOVE_E, {'o',0,0,0,0,0,0,0,0,0}},
-	{WA_PROTAG_MOVE_W, {'u',0,0,0,0,0,0,0,0,0}}
-};
-
 int fread_key_action_pairs(struct action_key* km, FILE *fd);
 int keymap_save(struct action_key* keymap);
 int keymap_add(struct action_key* keymap, int key, int action);
@@ -55,7 +47,7 @@ init_key_action_pairs(struct action_key *km)
 
 	if (fd == NULL) {
 		if (errno == ENOENT) {
-			km = (struct action_key *) default_keymap;
+			km = (struct action_key *) {0};
 			return 1;
 		}
 		else {

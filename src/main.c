@@ -9,16 +9,25 @@ void main_loop(struct state *s, struct game_data *gd);
 static void nc_init();
 static void sig_reg();
 
+const struct action_key default_keymap[ACTION_COUNT] = {
+	{WA_PROTAG_MOVE_N, {'e',0,0,0,0,0,0,0,0,0}},
+	{WA_PROTAG_MOVE_S, {'j',0,0,0,0,0,0,0,0,0}},
+	{WA_PROTAG_MOVE_E, {'o',0,0,0,0,0,0,0,0,0}},
+	{WA_PROTAG_MOVE_W, {'u',0,0,0,0,0,0,0,0,0}}
+};
+
 int
 main(int argc, char *args[])
 {
 	struct action_key km[ACTION_COUNT]; 
+	memcpy((void *) km, (void *) default_keymap, sizeof(struct action_key) * ACTION_COUNT);
 	struct state_machine sm;
 	struct game_data gd;
 
 	init_key_action_pairs((struct action_key *) &km);
 	init_statemachine(&sm,(struct action_key *) &km);
 
+	printf_state_machine_debug(&sm);
 	seed_map(&gd);
 
 	sig_reg();
@@ -52,7 +61,12 @@ void main_loop(
 	for (;;) {
 		wget_wch(stdscr, &k);
 
-		s->print_fn(s, gd);
+		al = get_state_action(s, k);
+		while (al != NULL) {
+			printf("found action");
+			al->action(s, gd);
+			al = al->next;
+		}
 
 		wrefresh(stdscr);
 	}

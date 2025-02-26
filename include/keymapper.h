@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-#define ACTION_COUNT 5
+#define ACTION_COUNT 4
 #define STATE_MASK_BITS 8
 #define MAX_KEYS_PER_ACTION 10
 #define STATE_MASK UINT_MAX << (sizeof(int)*8 - STATE_MASK_BITS)
@@ -35,6 +35,7 @@ struct action_code_tab {
 	wint_t key;
 	struct action_code_list *list;
 };
+
 
 int init_key_action_pairs(struct action_key* km);
 
